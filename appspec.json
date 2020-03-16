@@ -1,11 +1,25 @@
 {
   "settings": [
     {
-      "id": "thinoption",
+      "id": "testDropdown",
       "name": "Thinoption",
-      "type": "STRING",
+      "description": "Select the thin option.",
       "defaultValue": "1hour",
-      "description": "Select the thin option. Available values are \"no\", \"1hour\", \"1day\""
+      "type": "DROPDOWN",
+      "options": [
+        {
+          "value": "no",
+          "displayText": "no"
+        },
+        {
+          "value": "1hour",
+          "displayText": "1 Hour"
+        },
+        {
+          "value": "1day",
+          "displayText": "1 Day"
+        }
+      ]
     }
   ]
 }
