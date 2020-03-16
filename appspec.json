@@ -1,0 +1,11 @@
+{
+  "settings": [
+    {
+      "id": "thinoption",
+      "name": "Thinoption",
+      "type": "STRING",
+      "defaultValue": "1hour",
+      "description": "Select the thin option. Available values are \"no\", \"1hour\", \"1day\""
+    }
+  ]
+}
