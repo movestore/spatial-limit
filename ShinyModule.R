@@ -12,9 +12,9 @@ shinyModuleUserInterface <- function(id, label, thinoption = "1hour") {
   ns <- NS(id)
 
   tagList(
-  titlePanel("Choose individuals within the selected area"),
-  radioButtons(ns("thinoption"), label="Thin data for faster visualization",choices=c("No thining" = "no","1 location/hour" = "1hour","1 location/day" = "1day"), selected=thinoption, inline=T),
-  leafletOutput(ns("mymap")),
+    titlePanel("Choose individuals within the selected area"),
+    radioButtons(ns("thinoption"), label="Thin data for faster visualization",choices=c("No thining" = "no","1 location/hour" = "1hour","1 location/day" = "1day"), selected=thinoption, inline=T),
+    leafletOutput(ns("mymap")),
   )
 }
 
@@ -33,7 +33,7 @@ shinyModuleConfiguration <- function(id, input) {
 shinyModule <- function(input, output, session, data, thinoption = "1hour") {
   #### interactive object to read in .RData file  ####
   mvObj <- reactive({ data })
-  current <- reactiveVal(NULL)
+  current <- reactiveVal(data)
 
   #### storing the values clicked on the map while drawing the polygon  ####
   data_of_click <- reactiveValues(clickedMarker = list())
