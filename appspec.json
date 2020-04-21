@@ -1,4 +1,5 @@
 {
+  "version": "1.0",
   "settings": [
     {
       "id": "testDropdown",
@@ -21,5 +22,41 @@
         }
       ]
     }
-  ]
+  ],
+  "dependencies": {
+    "R": [
+      {
+        "name": "units",
+        "version": "0.6-6"
+      },
+      {
+        "name": "sp"
+      },
+      {
+        "name": "sf"
+      },
+      {
+        "name": "leaflet",
+        "version": "2.0.3"
+      },
+      {
+        "name": "leaflet.extras"
+      },
+      {
+        "name": "pals"
+      },
+      {
+        "name": "leafem"
+      },
+      {
+        "name": "leafpop"
+      },
+      {
+        "name": "mapview"
+      },
+      {
+        "name": "rgeos"
+      }
+    ]
+  }
 }
