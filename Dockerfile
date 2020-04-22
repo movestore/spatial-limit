@@ -1,7 +1,6 @@
 FROM registry.gitlab.com/couchbits/movestore/movestore-groundcontrol/movestore-apps/copilot-shiny:pilot1.0.0-r3.6.3-s1.4.0.2 AS buildstage
 
 WORKDIR /root/app
-COPY ShinyModule.R ./shiny/
 
 RUN Rscript -e 'remotes::install_version("units", "0.6-6")'
 RUN Rscript -e 'remotes::install_version("sp")'
@@ -17,10 +16,29 @@ RUN Rscript -e 'remotes::install_version("move")'
 RUN Rscript -e 'remotes::install_version("lubridate")'
 RUN Rscript -e 'packrat::snapshot()'
 
+# copy the app as last as possible
+# therefore following builds can use the docker cache of the R dependency installations
+COPY ShinyModule.R .
+
 # start again from the vanilla r-base image and copy only
 # the needed binaries from the buildstage.
 # this will reduce the resulting image size dramatically
+# spatial-limit    packrat-multi-stage              0cd0f8b22301        2 minutes ago       1.62GB
+# <none>           <none>                           fbe3f6d9458e        3 minutes ago       2.62GB
+
 FROM rocker/r-base:3.6.3
-#RUN mkdir -p /root/app/shiny
 WORKDIR /root/app
 COPY --from=buildstage /root/app .
+
+# Install JRE for pilot
+RUN apt-get update && \
+    apt-get install -y default-jre && \
+    apt-get clean;
+
+# Fix certificate issues
+RUN apt-get update && \
+    apt-get install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f;
+
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/root/app/app.jar"]
