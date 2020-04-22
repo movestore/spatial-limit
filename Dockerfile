@@ -1,23 +1,27 @@
-FROM registry.gitlab.com/couchbits/movestore/movestore-groundcontrol/movestore-apps/pilot-r:pilot1.0.0-r3.6.3-shiny1.4.0.2
+FROM registry.gitlab.com/couchbits/movestore/movestore-groundcontrol/movestore-apps/copilot-shiny:pilot1.0.0-r3.6.3-s1.4.0.2 AS buildstage
 
-COPY ShinyModule.R /root/app/shiny/ShinyModule.R
+WORKDIR /root/app
+RUN ls -al
+COPY ShinyModule.R ./shiny/
+COPY app-dependencies.R .
 
-WORKDIR /root/app/shiny
+RUN Rscript -e 'remotes::install_version("units", "0.6-6")' &&\
+    Rscript -e 'remotes::install_version("sp")' &&\
+    Rscript -e 'remotes::install_version("sf")' &&\
+    Rscript -e 'remotes::install_version("leaflet", "2.0.3")' &&\
+    Rscript -e 'remotes::install_version("leaflet.extras")' &&\
+    Rscript -e 'remotes::install_version("pals")' &&\
+    Rscript -e 'remotes::install_version("leafem")' &&\
+    Rscript -e 'remotes::install_version("leafpop")' &&\
+    Rscript -e 'remotes::install_version("mapview")' &&\
+    Rscript -e 'remotes::install_version("rgeos")' &&\
+    Rscript -e 'packrat::snapshot()' &&\
+RUN ls -al
 
-RUN jetpack init
-
-RUN jetpack add units@0.6-6
-RUN jetpack add sp
-RUN jetpack add sf
-RUN jetpack add leaflet@2.0.3
-RUN jetpack add leaflet.extras
-RUN jetpack add pals
-RUN jetpack add leafem
-RUN jetpack add leafpop
-RUN jetpack add mapview
-RUN jetpack add rgeos
-
-RUN Rscript -e 'packrat::init()'
-
-RUN cat DESCRIPTION
-RUN cat packrat.lock
+# start again from the vanilla r-base image and copy only
+# the needed binaries from the buildstage.
+# this will reduce the resulting image size dramatically
+FROM rocker/r-base:3.6.3
+#RUN mkdir -p /root/app/shiny
+WORKDIR /root/app
+COPY --from=buildstage /root/app .
