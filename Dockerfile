@@ -13,6 +13,8 @@ RUN Rscript -e 'remotes::install_version("leafem")'
 RUN Rscript -e 'remotes::install_version("leafpop")'
 RUN Rscript -e 'remotes::install_version("mapview")'
 RUN Rscript -e 'remotes::install_version("rgeos")'
+RUN Rscript -e 'remotes::install_version("move")'
+RUN Rscript -e 'remotes::install_version("lubridate")'
 RUN Rscript -e 'packrat::snapshot()'
 
 # start again from the vanilla r-base image and copy only

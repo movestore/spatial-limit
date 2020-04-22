@@ -56,6 +56,12 @@
       },
       {
         "name": "rgeos"
+      },
+      {
+        "name": "move"
+      },
+      {
+        "name": "lubridate"
       }
     ]
   }
