@@ -26,6 +26,9 @@
   "dependencies": {
     "R": [
       {
+        "name": "shiny"
+      },
+      {
         "name": "units",
         "version": "0.6-6"
       },
