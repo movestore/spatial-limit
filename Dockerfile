@@ -1,5 +1,11 @@
 FROM registry.gitlab.com/couchbits/movestore/movestore-groundcontrol/movestore-apps/copilot-shiny:pilot1.0.0-r3.6.3-s1.4.0.2 AS buildstage
 
+# install system dependencies required by this app
+RUN apt-get update && apt-get install -qq -y --no-install-recommends \
+  libgdal-dev \
+  libproj-dev \
+  libudunits2-dev
+
 WORKDIR /root/app
 
 RUN Rscript -e 'remotes::install_version("units", "0.6-6")'
