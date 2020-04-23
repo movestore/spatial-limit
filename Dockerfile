@@ -30,24 +30,12 @@ COPY ShinyModule.R .
 # start again from the vanilla r-base image and copy only
 # the needed binaries from the buildstage.
 # this will reduce the resulting image size dramatically
-# spatial-limit    packrat-multi-stage              0cd0f8b22301        2 minutes ago       1.62GB
-# <none>           <none>                           fbe3f6d9458e        3 minutes ago       2.62GB
+# spatial-limit                packrat-multi-stage              aede04d7f1cb        17 minutes ago      2.39GB
+# <none>                       <none>                           0df415987e52        41 minutes ago      2.62GB
 
-FROM rocker/r-base:3.6.3
-WORKDIR /root/app
-COPY --from=buildstage /root/app .
-COPY --from=buildstage /usr/lib/R/etc/Rprofile.site /usr/lib/R/etc/
-
-# TODO: can we copy the libraries from the base-image? do we even need them during build?
-RUN apt-get update && apt-get install -qq -y --no-install-recommends \
-  libgdal-dev \
-  libproj-dev \
-  libudunits2-dev \
-# Install JRE for pilot
-  default-jre && \
-# Fix certificate issues
-  apt-get install ca-certificates-java && \
-  apt-get clean && \
-  update-ca-certificates -f;
+#FROM rocker/r-base:3.6.3
+#WORKDIR /root/app
+#COPY --from=buildstage /root/app .
+#COPY --from=buildstage /usr/lib/R/etc/Rprofile.site /usr/lib/R/etc/
 
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/root/app/app.jar"]
