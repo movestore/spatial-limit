@@ -14,6 +14,7 @@ RUN Rscript -e 'remotes::install_version("mapview")'
 RUN Rscript -e 'remotes::install_version("rgeos")'
 RUN Rscript -e 'remotes::install_version("move")'
 RUN Rscript -e 'remotes::install_version("lubridate")'
+RUN Rscript -e 'remotes::install_version("rgdal")'
 RUN Rscript -e 'packrat::snapshot()'
 
 # copy the app as last as possible
@@ -29,16 +30,18 @@ COPY ShinyModule.R .
 FROM rocker/r-base:3.6.3
 WORKDIR /root/app
 COPY --from=buildstage /root/app .
+COPY --from=buildstage /usr/lib/R/etc/Rprofile.site /usr/lib/R/etc/
 
+# TODO: can we copy the libraries from the base-image? do we even need them during build?
+RUN apt-get update && apt-get install -qq -y --no-install-recommends \
+  libgdal-dev \
+  libproj-dev \
+  libudunits2-dev \
 # Install JRE for pilot
-RUN apt-get update && \
-    apt-get install -y default-jre && \
-    apt-get clean;
-
+  default-jre && \
 # Fix certificate issues
-RUN apt-get update && \
-    apt-get install ca-certificates-java && \
-    apt-get clean && \
-    update-ca-certificates -f;
+  apt-get install ca-certificates-java && \
+  apt-get clean && \
+  update-ca-certificates -f;
 
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/root/app/app.jar"]
