@@ -2,7 +2,7 @@
   "version": "1.0",
   "settings": [
     {
-      "id": "testDropdown",
+      "id": "thinoption",
       "name": "Thinoption",
       "description": "Select the thin option.",
       "defaultValue": "1hour",
