@@ -14,7 +14,7 @@ shinyModuleUserInterface <- function(id, label, thinoption = "1hour") {
   tagList(
     titlePanel("Choose individuals within the selected area"),
     radioButtons(ns("thinoption"), label="Thin data for faster visualization",choices=c("No thining" = "no","1 location/hour" = "1hour","1 location/day" = "1day"), selected=thinoption, inline=T),
-    leafletOutput(ns("mymap")),
+    leafletOutput(ns("mymap"))
   )
 }
 
