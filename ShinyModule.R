@@ -12,37 +12,29 @@ shinyModuleUserInterface <- function(id, label, thinoption = "1hour") {
   ns <- NS(id)
 
   tagList(
-    titlePanel("Choose individuals within the selected area"),
-    radioButtons(ns("thinoption"), label="Thin data for faster visualization",choices=c("No thining" = "no","1 location/hour" = "1hour","1 location/day" = "1day"), selected=thinoption, inline=T),
+    titlePanel("Choose individuals within a selected area"), ## change acording to readme
+    radioButtons(ns("thinoption"), label="Thin data for faster visualization",choices=c("No thining" = "no","1 location/hour" = "1hour","1 location/day" = "1day"), selected="1hour", inline=T),
     leafletOutput(ns("mymap"))
   )
 }
 
 shinyModuleConfiguration <- function(id, input) {
   ns <- NS(id)
-
   configuration <- list()
-
-  print(ns('thinoption'))
-
-  configuration["thinoption"] <- input[[ns('thinoption')]]
-
   configuration
 }
 
-shinyModule <- function(input, output, session, data, thinoption = "1hour") {
-  #### interactive object to read in .RData file  ####
-  mvObj <- reactive({ data })
+shinyModule <- function(input, output, session, data) {
+  ns <- session$ns
   current <- reactiveVal(data)
-
+  
   #### storing the values clicked on the map while drawing the polygon  ####
   data_of_click <- reactiveValues(clickedMarker = list())
 
-  #### creating leaflet map  ####
+  ### creating leaflet map  ####
   output$mymap <- renderLeaflet({
     #### making new object for simplicity, and preparing the data for the plot
-    m <- mvObj()
-    if(!class(m)=="MoveStack"){stop("It seems you are only working with one individual. This App is intended for sevelal individuals. Single individuals cannot be used in this function.")}
+    m <- data
     ## if option "no thining" is selected, than nothing happens
     if(input$thinoption=="no"){mv <- m}
     ## if option "1 location/hour" is selected the trajectory gets thinned to aprox. one location per hour
@@ -53,7 +45,7 @@ shinyModule <- function(input, output, session, data, thinoption = "1hour") {
     mvL <- move::split(mv)
 
     #### the leaflet plot with all individulas. When you hover over a specific individual, this one will be highlighted. On the side bar shapes to select an are cn be chosen
-    cols <- colorFactor(brewer.spectral(n.indiv(mv)), domain=namesIndiv(mv))
+    cols <- colorFactor(turbo(n.indiv(mv)), domain=namesIndiv(mv))
     map1 <- leaflet(mv) %>% addTiles()
     for(i in mvL){
       map1 <- addPolylines(map1, lng = coordinates(i)[,1],lat = coordinates(i)[,2],color=~cols(namesIndiv(i)),weight=5, opacity=0.7, layerId=namesIndiv(i), highlightOptions = highlightOptions(color = "red",opacity = 1,weight = 2, bringToFront = TRUE))
@@ -83,15 +75,15 @@ shinyModule <- function(input, output, session, data, thinoption = "1hour") {
       c(x[[1]][1], x[[2]][1])
     })))
     spol <- sp::SpatialPolygons(list(sp::Polygons(list(drawn_polygon),"drawn_polygon")))
-    projection(spol) <- projection(mvObj())
+    projection(spol) <- projection(data)
     selectPoly <- reactive({spol}) ## I think this is the object that should be saved, as the input of individuals could change
     ## cookie cutting the track with the polygon
-    sub <- crop(mvObj(), selectPoly())
+    sub <- crop(data, selectPoly())
     ## extracting the names of the individuals that fall in this area
     subIDs <- namesIndiv(sub)
     ### creating an reactive object with the selected individuals. This is the object for the output of this app
     selectR <- reactive({
-      mvObj()[[subIDs]]
+      moveStack(data[[subIDs]]) ## CORRECT FOR TZ
     })
 
     ## preparing the selected data to plot the in a different color and make them visible as selected on the map
@@ -107,7 +99,7 @@ shinyModule <- function(input, output, session, data, thinoption = "1hour") {
     }
     proxy
 
-    current(mvObj()[[subIDs]])
+    current(moveStack(data[[subIDs]])) ## CORRECT FOR TZ
   })
 
   #### the inteaction with the map, when I want to cancel my selection, the highlighted individuals and the polygon gets removed ####
@@ -120,10 +112,10 @@ shinyModule <- function(input, output, session, data, thinoption = "1hour") {
         c(x[[1]][1], x[[2]][1])
       })))
       spol <- sp::SpatialPolygons(list(sp::Polygons(list(drawn_polygon),"drawn_polygon")))
-      projection(spol) <- projection(mvObj())
-      sub <- crop(mvObj(), spol)
+      projection(spol) <- projection(data)
+      sub <- crop(data, spol)
       subIDs <- namesIndiv(sub)
-      selectI <- mvObj()[[subIDs]]
+      selectI <- data[[subIDs]]
 
 
       ## getting the leaflet map, and removing the selected individuals
@@ -134,7 +126,7 @@ shinyModule <- function(input, output, session, data, thinoption = "1hour") {
       data_of_click$clickedMarker <- data_of_click$clickedMarker[!data_of_click$clickedMarker %in% first_layer_ids]
     }
 
-    current(mvObj()[[subIDs]])
+    current(moveStack(data[[subIDs]])) ## CORRECT FOR TZ
   })
 
   return(reactive({ current() }))
