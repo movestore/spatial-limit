@@ -1,18 +1,15 @@
-# Choose Individuals Within A Selected Area 
-# crop data to a selected area 
-# selection of individuals that fall in a selected arae
-# subset data to a user defined area
-
-
+# Select Tracks by Space Use
 MoveApps
 
-Github repository: 
+Github repository: *github.com/movestore/spatial-limit*
 
 ## Description
-select the individuals that fall within an area defined by the user
+Select interactively the tracks of individuals that use area defined by the user.
 
 ## Documentation
-This app enables to subset the data based on a user defined area. The user can draw a rectangle/polygon/circle?, and all individuals that fall within the drawn area will be selected. The tracks will not be "cut of", as the entire trajectory of the individuals will be selected (event though parts may fall outside the drawn polygon).
+This highly interactive App allows the selection of (complete) tracks that pass through or use a defined area by point-clicking. Select either a rectangular area or a line-polygon. The tracks will not be "cut of", as the entire trajectories of the individuals will be selected (event though parts may fall outside the drawn polygon).
+
+At selection of the option, the tracks can be pre-thinned. The resulting (set of) track(s) is transferred to the next App or can be downloaded as output .rds.
 
 
 ### Input data
@@ -22,11 +19,11 @@ moveStack in Movebank format
 moveStack in Movebank format
 
 ### Artefacts
-
+none.
 
 ### Parameters
-`Select attribute`: one attribute from the drop down list can be selected. All available attributes associated to the locations of the study are displayed.
+`thinoption`: A thinning option from the drop down list can be selected, but can also be adapted in the UI afterwards (options: no thinning, 1 location/hour, 1 location/day).
 
 
 ### Null or error handling
-**Data**: For use in further Apps the input data set is returned unmodified. Empty input will give an error.
+**Data**: If no area is selected or no tracks fall within the selected area, the full data set it returned.
